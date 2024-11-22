@@ -1,25 +1,36 @@
 package com.example.loginexemplr.controllers;
 
-import com.example.loginexemplr.security.jwt.JwtUtils;
+import com.example.loginexemplr.models.User;
+import com.example.loginexemplr.payload.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/test")
 public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
+    @Autowired
+    private final UserRepository userRepository;
 
-    @GetMapping("/all")
-    public String allAccess() {
-        return "Public Content.";
+    public TestController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
+
+    @GetMapping("/all")
+    public List<User> allAccess() {
+        logger.info("Public Content.");
+        return userRepository.findAll();
+    }
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public String userAccess() {
